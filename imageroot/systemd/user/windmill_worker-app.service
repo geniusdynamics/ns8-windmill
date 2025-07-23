@@ -1,0 +1,30 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+[Unit]
+Description=Podman  windmill_worker-app.service
+BindsTo=windmill.service
+After=windmill.service db-app.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+EnvironmentFile=-%S/state/smarthost.env
+WorkingDirectory=%S/state
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/mkdir -p tmp
+ExecStartPre=/bin/rm -f %t/windmill_worker-app.pid %t/windmill_worker-app.ctr-id
+ExecStartPre=-runagent discover-smarthost
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/windmill_worker-app.pid  --cidfile %t/windmill_worker-app.ctr-id --cgroups=no-conmon  --pod-id-file %t/windmill.pod-id --replace -d --name  windmill_worker-app  --volume run-dockersock:/var/run/docker.sock:Z --volume workerdependencycache:/tmp/windmill/cache:Z --volume workerlogs:/tmp/windmill/logs:Z   --env-file windmill_worker.env  ${${WM_IMAGE}_IMAGE}  
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/windmill_worker-app.ctr-id -t 10
+ExecReload=/usr/bin/podman kill -s HUP windmill_worker-app
+SyslogIdentifier=%u
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/windmill_worker-app.ctr-id
+PIDFile=%t/windmill_worker-app.pid
+Type=forking
+
+[Install]
+WantedBy=default.target
