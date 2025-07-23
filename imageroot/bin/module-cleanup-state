@@ -6,3 +6,4 @@
 #
 
 rm -vf windmill.sql
+rm -vf db.pg_dump
