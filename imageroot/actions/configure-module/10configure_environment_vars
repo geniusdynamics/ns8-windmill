@@ -47,3 +47,9 @@ agent.write_envfile("lsp.env", lsp)
 multiplayer = { 
 } 
 agent.write_envfile("multiplayer.env", multiplayer) 
+BASE_URL = data.get("BASE_URL", "":80"") 
+ 
+caddy = { 
+ "BASE_URL" : BASE_URL ,
+} 
+agent.write_envfile("caddy.env", caddy) 
