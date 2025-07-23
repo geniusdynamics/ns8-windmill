@@ -19,3 +19,5 @@ podman exec mariadb-app mysqldump \
         --single-transaction \
         --quick \
         --add-drop-table  > windmill.sql
+echo "Dumping  postgres database"
+podman exec db-app pg_dump -U postgres --format=c  db > db.pg_dump
