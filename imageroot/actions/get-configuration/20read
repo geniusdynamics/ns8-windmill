@@ -24,3 +24,66 @@ config["lets_encrypt"] = os.getenv("TRAEFIK_LETS_ENCRYPT") == "True"
 
 # Dump the configuration to stdout
 # json.dump(config, fp=sys.stdout)
+if os.path.exists("windmill_worker_native.env"): 
+	data = agent.read_envfile("windmill_worker_native.env") 
+	config["DATABASE_URL"] = data.get("DATABASE_URL", "${DATABASE_URL}") 
+	config["MODE"] = data.get("MODE", "worker") 
+	config["WORKER_GROUP"] = data.get("WORKER_GROUP", "native") 
+	config["NUM_WORKERS"] = data.get("NUM_WORKERS", "8") 
+	config["SLEEP_QUEUE"] = data.get("SLEEP_QUEUE", "200") 
+else: 
+	config["DATABASE_URL"] = "${DATABASE_URL}" 
+	config["MODE"] = "worker" 
+	config["WORKER_GROUP"] = "native" 
+	config["NUM_WORKERS"] = "8" 
+	config["SLEEP_QUEUE"] = "200" 
+ 
+if os.path.exists("windmill_indexer.env"): 
+	data = agent.read_envfile("windmill_indexer.env") 
+	config["PORT"] = data.get("PORT", "8002") 
+	config["DATABASE_URL"] = data.get("DATABASE_URL", "${DATABASE_URL}") 
+	config["MODE"] = data.get("MODE", "indexer") 
+else: 
+	config["MODE"] = "indexer" 
+	config["PORT"] = "8002" 
+	config["DATABASE_URL"] = "${DATABASE_URL}" 
+ 
+if os.path.exists("lsp.env"): 
+	data = agent.read_envfile("lsp.env") 
+ 
+if os.path.exists("multiplayer.env"): 
+	data = agent.read_envfile("multiplayer.env") 
+ 
+if os.path.exists("caddy.env"): 
+	data = agent.read_envfile("caddy.env") 
+	config["BASE_URL"] = data.get("BASE_URL", "":80"") 
+else: 
+	config["BASE_URL"] = "":80"" 
+ 
+if os.path.exists("db.env"): 
+	data = agent.read_envfile("db.env") 
+	config["POSTGRES_DB"] = data.get("POSTGRES_DB", "windmill") 
+	config["POSTGRES_PASSWORD"] = data.get("POSTGRES_PASSWORD", "changeme") 
+else: 
+	config["POSTGRES_PASSWORD"] = "changeme" 
+	config["POSTGRES_DB"] = "windmill" 
+ 
+if os.path.exists("windmill_server.env"): 
+	data = agent.read_envfile("windmill_server.env") 
+	config["DATABASE_URL"] = data.get("DATABASE_URL", "${DATABASE_URL}") 
+	config["MODE"] = data.get("MODE", "server") 
+else: 
+	config["DATABASE_URL"] = "${DATABASE_URL}" 
+	config["MODE"] = "server" 
+ 
+if os.path.exists("windmill_worker.env"): 
+	data = agent.read_envfile("windmill_worker.env") 
+	config["DATABASE_URL"] = data.get("DATABASE_URL", "${DATABASE_URL}") 
+	config["MODE"] = data.get("MODE", "worker") 
+	config["WORKER_GROUP"] = data.get("WORKER_GROUP", "default") 
+else: 
+	config["DATABASE_URL"] = "${DATABASE_URL}" 
+	config["MODE"] = "worker" 
+	config["WORKER_GROUP"] = "default" 
+ 
+json.dump(config, fp=sys.stdout)
