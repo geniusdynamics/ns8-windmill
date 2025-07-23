@@ -11,9 +11,9 @@ set -e
 # Prepare variables for later use
 images=()
 # The image will be pushed to GitHub container registry
-repobase="${REPOBASE:-ghcr.io/{{ GITHUB_OWNER }}}"
+repobase="${REPOBASE:-ghcr.io/geniusdynamics}"
 # Configure the image name
-reponame="{{ IMAGE_NAME }}"
+reponame="windmill"
 
 # Create a new empty container image
 container=$(buildah from scratch)
@@ -45,7 +45,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images={{ IMAGES }}" \
+    --label="org.nethserver.images=ghcr.io/windmill-labs/windmill-multiplayer:latest ghcr.io/windmill-labs/caddy-l4:latest docker.io/postgres:16 docker.io/${WM_IMAGE} docker.io/${WM_IMAGE} docker.io/${WM_IMAGE} docker.io/${WM_IMAGE} ghcr.io/windmill-labs/windmill-lsp:latest" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
