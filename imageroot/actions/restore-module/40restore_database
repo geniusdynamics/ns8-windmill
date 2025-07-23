@@ -39,3 +39,28 @@ set -e -o pipefail
 #   --env MARIADB_PASSWORD=windmill \
 #   --replace --name=restore_db \
 #   ${MARIADB_IMAGE}
+# Create restore directory
+mkdir -vp restore
+
+# Create restore script
+cat - >restore/monica_restore.sh <<'EOS'
+# Read dump file from standard input:
+pg_restore --no-owner --no-privileges -U postgres -d db
+ec=$?
+docker_temp_server_stop
+exit $ec
+EOS
+
+# Run the restore container
+podman run \
+    --rm \
+    --interactive \
+    --network=none \
+    --volume=./restore:/docker-entrypoint-initdb.d/:Z \
+    --volume=postgres-data:/var/lib/postgresql/data:Z \
+    --replace --name=restore_db \
+    --env-file db.env \
+    "${POSTGRES_IMAGE}" < db.pg_dump
+
+# Clean up
+rm -rfv restore/ db.pg_dump
