@@ -1,0 +1,30 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+[Unit]
+Description=Podman  multiplayer-app.service
+BindsTo=windmill.service
+After=windmill.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+EnvironmentFile=-%S/state/smarthost.env
+WorkingDirectory=%S/state
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/mkdir -p tmp
+ExecStartPre=/bin/rm -f %t/multiplayer-app.pid %t/multiplayer-app.ctr-id
+ExecStartPre=-runagent discover-smarthost
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/multiplayer-app.pid  --cidfile %t/multiplayer-app.ctr-id --cgroups=no-conmon  --pod-id-file %t/windmill.pod-id --replace -d --name  multiplayer-app     --env-file multiplayer.env  ${WINDMILL_MULTIPLAYER_IMAGE}  
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/multiplayer-app.ctr-id -t 10
+ExecReload=/usr/bin/podman kill -s HUP multiplayer-app
+SyslogIdentifier=%u
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/multiplayer-app.ctr-id
+PIDFile=%t/multiplayer-app.pid
+Type=forking
+
+[Install]
+WantedBy=default.target
