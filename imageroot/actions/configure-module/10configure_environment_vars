@@ -53,3 +53,11 @@ caddy = {
  "BASE_URL" : BASE_URL ,
 } 
 agent.write_envfile("caddy.env", caddy) 
+DATABASE_URL = data.get("DATABASE_URL", "${DATABASE_URL}") 
+MODE = data.get("MODE", "server") 
+ 
+windmill_server = { 
+ "DATABASE_URL" : DATABASE_URL ,
+ "MODE" : MODE ,
+} 
+agent.write_envfile("windmill_server.env", windmill_server) 
