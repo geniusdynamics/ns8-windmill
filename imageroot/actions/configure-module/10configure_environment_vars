@@ -61,3 +61,13 @@ windmill_server = {
  "MODE" : MODE ,
 } 
 agent.write_envfile("windmill_server.env", windmill_server) 
+DATABASE_URL = data.get("DATABASE_URL", "${DATABASE_URL}") 
+MODE = data.get("MODE", "worker") 
+WORKER_GROUP = data.get("WORKER_GROUP", "default") 
+ 
+windmill_worker = { 
+ "DATABASE_URL" : DATABASE_URL ,
+ "MODE" : MODE ,
+ "WORKER_GROUP" : WORKER_GROUP ,
+} 
+agent.write_envfile("windmill_worker.env", windmill_worker) 
