@@ -10,9 +10,9 @@ set -e -o pipefail
 #
 # # Prepare an initialization script that restores the dump file
 # mkdir -vp initdb.d
-# mv -v kickstart.sql initdb.d
+# mv -v windmill.sql initdb.d
 # #do the bash file to restore and exit once done
-# cat - >initdb.d/zz_kickstart_restore.sh <<'EOS'
+# cat - >initdb.d/zz_windmill_restore.sh <<'EOS'
 # # Print additional information:
 # mysql --version
 # # The script is sourced, override entrypoint args and exit:
@@ -25,7 +25,7 @@ set -e -o pipefail
 # trap 'rm -rfv initdb.d/' EXIT
 
 # we start a container to initiate a database and load the dump
-# at the end of kickstart_restore.sh the dump is loaded and
+# at the end of windmill_restore.sh the dump is loaded and
 # we exit the container
 # podman run \
 #   --rm \
@@ -34,8 +34,8 @@ set -e -o pipefail
 #   --volume=./initdb.d:/docker-entrypoint-initdb.d:z \
 #   --volume mysql-data:/var/lib/mysql/:Z \
 #   --env MARIADB_ROOT_PASSWORD=Nethesis,1234 \
-#   --env MARIADB_DATABASE=kickstart \
-#   --env MARIADB_USER=kickstart \
-#   --env MARIADB_PASSWORD=kickstart \
+#   --env MARIADB_DATABASE=windmill \
+#   --env MARIADB_USER=windmill \
+#   --env MARIADB_PASSWORD=windmill \
 #   --replace --name=restore_db \
 #   ${MARIADB_IMAGE}
