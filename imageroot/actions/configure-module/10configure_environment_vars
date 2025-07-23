@@ -39,3 +39,7 @@ windmill_indexer = {
  "MODE" : MODE ,
 } 
 agent.write_envfile("windmill_indexer.env", windmill_indexer) 
+ 
+lsp = { 
+} 
+agent.write_envfile("lsp.env", lsp) 
