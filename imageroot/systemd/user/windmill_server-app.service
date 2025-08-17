@@ -18,7 +18,7 @@ TimeoutStopSec=70
 ExecStartPre=/bin/mkdir -p tmp
 ExecStartPre=/bin/rm -f %t/windmill_server-app.pid %t/windmill_server-app.ctr-id
 ExecStartPre=-runagent discover-smarthost
-ExecStart=/usr/bin/podman run --conmon-pidfile %t/windmill_server-app.pid  --cidfile %t/windmill_server-app.ctr-id --cgroups=no-conmon  --pod-id-file %t/windmill.pod-id --replace -d --name  windmill_server-app  --volume workerlogs:/tmp/windmill/logs:Z   --env-file windmill_server.env  ${${WM_IMAGE}_IMAGE}  
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/windmill_server-app.pid  --cidfile %t/windmill_server-app.ctr-id --cgroups=no-conmon  --pod-id-file %t/windmill.pod-id --replace -d --name  windmill_server-app  --volume workerlogs:/tmp/windmill/logs:Z   --env-file windmill_server.env --env-file db.env  ${WINDMILL_IMAGE}  
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/windmill_server-app.ctr-id -t 10
 ExecReload=/usr/bin/podman kill -s HUP windmill_server-app
 SyslogIdentifier=%u

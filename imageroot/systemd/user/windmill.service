@@ -10,8 +10,8 @@
 
 [Unit]
 Description=Podman windmill.service
-Requires=windmill-multiplayer-app.service caddy-l4-app.service postgres-app.service ${wm_image}-app.service ${wm_image}-app.service ${wm_image}-app.service ${wm_image}-app.service windmill-lsp-app.service 
-Before=windmill-multiplayer-app.service caddy-l4-app.service postgres-app.service ${wm_image}-app.service ${wm_image}-app.service ${wm_image}-app.service ${wm_image}-app.service windmill-lsp-app.service 
+Requires=windmill-multiplayer-app.service caddy-l4-app.service postgres-app.service  windmill_indexer-app.service windmill_server-app.service windmill_worker-app.service windmill_worker_native-app.service windmill-lsp-app.service
+Before=windmill-multiplayer-app.service caddy-l4-app.service postgres-app.service windmill_indexer-app.service windmill_server-app.service windmill_worker-app.service windmill_worker_native-app.service windmill-lsp-app.service 
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
