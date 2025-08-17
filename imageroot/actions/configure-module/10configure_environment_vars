@@ -13,61 +13,51 @@ import agent
 # If parsing fails, output everything to stderr
 data = json.load(sys.stdin)
 
-#This is specific to you module, so you need to change it accordingly.
-#agent.dump_env()
-DATABASE_URL = data.get("DATABASE_URL", "${DATABASE_URL}") 
-MODE = data.get("MODE", "worker") 
-WORKER_GROUP = data.get("WORKER_GROUP", "native") 
-NUM_WORKERS = data.get("NUM_WORKERS", "8") 
-SLEEP_QUEUE = data.get("SLEEP_QUEUE", "200") 
- 
-windmill_worker_native = { 
- "DATABASE_URL" : DATABASE_URL ,
- "MODE" : MODE ,
- "WORKER_GROUP" : WORKER_GROUP ,
- "NUM_WORKERS" : NUM_WORKERS ,
- "SLEEP_QUEUE" : SLEEP_QUEUE ,
-} 
-agent.write_envfile("windmill_worker_native.env", windmill_worker_native) 
-PORT = data.get("PORT", "8002") 
-DATABASE_URL = data.get("DATABASE_URL", "${DATABASE_URL}") 
-MODE = data.get("MODE", "indexer") 
- 
-windmill_indexer = { 
- "PORT" : PORT ,
- "DATABASE_URL" : DATABASE_URL ,
- "MODE" : MODE ,
-} 
-agent.write_envfile("windmill_indexer.env", windmill_indexer) 
- 
-lsp = { 
-} 
-agent.write_envfile("lsp.env", lsp) 
- 
-multiplayer = { 
-} 
-agent.write_envfile("multiplayer.env", multiplayer) 
-BASE_URL = data.get("BASE_URL", "":80"") 
- 
-caddy = { 
- "BASE_URL" : BASE_URL ,
-} 
-agent.write_envfile("caddy.env", caddy) 
-DATABASE_URL = data.get("DATABASE_URL", "${DATABASE_URL}") 
-MODE = data.get("MODE", "server") 
- 
-windmill_server = { 
- "DATABASE_URL" : DATABASE_URL ,
- "MODE" : MODE ,
-} 
-agent.write_envfile("windmill_server.env", windmill_server) 
-DATABASE_URL = data.get("DATABASE_URL", "${DATABASE_URL}") 
-MODE = data.get("MODE", "worker") 
-WORKER_GROUP = data.get("WORKER_GROUP", "default") 
- 
-windmill_worker = { 
- "DATABASE_URL" : DATABASE_URL ,
- "MODE" : MODE ,
- "WORKER_GROUP" : WORKER_GROUP ,
-} 
-agent.write_envfile("windmill_worker.env", windmill_worker) 
+# This is specific to you module, so you need to change it accordingly.
+# agent.dump_env()
+MODE = data.get("MODE", "worker")
+WORKER_GROUP = data.get("WORKER_GROUP", "native")
+NUM_WORKERS = data.get("NUM_WORKERS", "8")
+SLEEP_QUEUE = data.get("SLEEP_QUEUE", "200")
+
+windmill_worker_native = {
+    "MODE": MODE,
+    "WORKER_GROUP": WORKER_GROUP,
+    "NUM_WORKERS": NUM_WORKERS,
+    "SLEEP_QUEUE": SLEEP_QUEUE,
+}
+agent.write_envfile("windmill_worker_native.env", windmill_worker_native)
+PORT = data.get("PORT", "8002")
+MODE = data.get("MODE", "indexer")
+
+windmill_indexer = {
+    "PORT": PORT,
+    "MODE": MODE,
+}
+agent.write_envfile("windmill_indexer.env", windmill_indexer)
+
+lsp = {}
+agent.write_envfile("lsp.env", lsp)
+
+multiplayer = {}
+agent.write_envfile("multiplayer.env", multiplayer)
+BASE_URL = data.get("BASE_URL", f"https://{data.get('host')}")
+
+caddy = {
+    "BASE_URL": BASE_URL,
+}
+agent.write_envfile("caddy.env", caddy)
+MODE = data.get("MODE", "server")
+
+windmill_server = {
+    "MODE": MODE,
+}
+agent.write_envfile("windmill_server.env", windmill_server)
+MODE = data.get("MODE", "worker")
+WORKER_GROUP = data.get("WORKER_GROUP", "default")
+
+windmill_worker = {
+    "MODE": MODE,
+    "WORKER_GROUP": WORKER_GROUP,
+}
+agent.write_envfile("windmill_worker.env", windmill_worker)
