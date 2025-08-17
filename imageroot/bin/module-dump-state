@@ -8,16 +8,8 @@
 set -e
 
 if ! systemctl --user -q is-active windmill.service; then
-    exit 0
+	exit 0
 fi
 
-podman exec mariadb-app mysqldump \
-        --databases windmill \
-        --default-character-set=utf8mb4 \
-        --skip-dump-date \
-        --ignore-table=mysql.event \
-        --single-transaction \
-        --quick \
-        --add-drop-table  > windmill.sql
 echo "Dumping  postgres database"
-podman exec db-app pg_dump -U postgres --format=c  db > db.pg_dump
+podman exec db-app pg_dump -U postgres --format=c db >db.pg_dump
