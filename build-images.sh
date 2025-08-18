@@ -45,7 +45,7 @@ buildah config --entrypoint=/ \
 	--label="org.nethserver.authorizations=traefik@node:routeadm" \
 	--label="org.nethserver.tcp-ports-demand=1" \
 	--label="org.nethserver.rootfull=0" \
-	--label="org.nethserver.images=ghcr.io/windmill-labs/windmill-multiplayer:latest ghcr.io/windmill-labs/caddy-l4:latest docker.io/postgres:16 ghcr.io/windmill-labs/windmill:main  ghcr.io/windmill-labs/windmill-lsp:latest" \
+	--label="org.nethserver.images=ghcr.io/windmill-labs/windmill-multiplayer:main ghcr.io/windmill-labs/caddy-l4:latest docker.io/postgres:16 ghcr.io/windmill-labs/windmill:main  ghcr.io/windmill-labs/windmill-lsp:latest" \
 	"${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
