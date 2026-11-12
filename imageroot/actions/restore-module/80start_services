@@ -1,17 +1,17 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2023 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
+
 set -e
 
 # Redirect any output to the journal (stderr)
 exec 1>&2
 
-# If the control reaches this step, the service can be enabled and started
-
-touch smarthost.env
-
+# If the control reaches this step, the service can be enabled and started.
+# Starting the pod does not start its children: restart every service
+# explicitly, pod first, then the database, then the applications.
 systemctl --user enable windmill.service
-systemctl --user restart windmill.service
+systemctl --user restart windmill.service db-app.service server-app.service worker-app.service worker-native-app.service extra-app.service caddy-app.service
