@@ -1,27 +1,33 @@
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 [Unit]
-Description=Podman  caddy-app.service
+Description=Windmill Caddy gateway (port 80)
 BindsTo=windmill.service
 After=windmill.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
-EnvironmentFile=%S/state/environment
-EnvironmentFile=-%S/state/smarthost.env
-WorkingDirectory=%S/state
+EnvironmentFile=%E/state/environment
+WorkingDirectory=%E/state
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/mkdir -p tmp
 ExecStartPre=/bin/rm -f %t/caddy-app.pid %t/caddy-app.ctr-id
-ExecStartPre=-runagent discover-smarthost
-ExecStart=/usr/bin/podman run --conmon-pidfile %t/caddy-app.pid  --cidfile %t/caddy-app.ctr-id --cgroups=no-conmon  --pod-id-file %t/windmill.pod-id --replace -d --name  caddy-app  --volume Caddyfile:/etc/caddy/Caddyfile:Z --volume caddydata:/data:Z   --env-file caddy.env  ${CADDY_L4_IMAGE}  
+# Write state/Caddyfile, which is not part of the backup
+ExecStartPre=runagent write-caddyfile
+ExecStart=/usr/bin/podman run \
+    --detach \
+    --conmon-pidfile=%t/caddy-app.pid \
+    --cidfile=%t/caddy-app.ctr-id \
+    --cgroups=no-conmon \
+    --pod-id-file=%t/windmill.pod-id \
+    --replace --name=caddy-app \
+    --volume=./Caddyfile:/etc/caddy/Caddyfile:ro,Z \
+    ${CADDY_L4_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/caddy-app.ctr-id -t 10
-ExecReload=/usr/bin/podman kill -s HUP caddy-app
-SyslogIdentifier=%u
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/caddy-app.ctr-id
 PIDFile=%t/caddy-app.pid
 Type=forking

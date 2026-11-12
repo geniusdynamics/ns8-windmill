@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2026 Genius Dynamics
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Write the Caddy gateway configuration in the current directory (state/).
+# Caddy runs in the same pod as the other services, so every upstream is
+# reached on 127.0.0.1. TLS is terminated by Traefik: Caddy only serves
+# plain HTTP on port 80.
+#
+
+set -e
+
+cat >Caddyfile.tmp <<'EOCADDY'
+{
+	auto_https off
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+:80 {
+	bind 0.0.0.0
+
+	# Language server (/ws), multiplayer (/ws_mp) and debugger (/ws_debug)
+	@extra path /ws/* /ws_mp/* /ws_debug/*
+	reverse_proxy @extra http://127.0.0.1:3000
+
+	# Everything else is the Windmill server
+	reverse_proxy /* http://127.0.0.1:8000
+}
+EOCADDY
+mv Caddyfile.tmp Caddyfile
