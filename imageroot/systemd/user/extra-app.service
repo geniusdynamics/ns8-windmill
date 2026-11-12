@@ -1,0 +1,45 @@
+#
+# Copyright (C) 2026 Genius Dynamics
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+[Unit]
+Description=Windmill extra services (language server and debugger)
+BindsTo=windmill.service
+After=windmill.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%E/state/environment
+WorkingDirectory=%E/state
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/mkdir -p tmp
+ExecStartPre=/bin/rm -f %t/extra-app.pid %t/extra-app.ctr-id
+# The gateway listens on port 3000 and routes /ws/* (language server),
+# /ws_debug/* (debugger) and /ws_mp/* (multiplayer, Enterprise Edition,
+# disabled). Debug sessions must carry a token signed by the Windmill
+# server, which the service verifies at WINDMILL_BASE_URL.
+ExecStart=/usr/bin/podman run \
+    --detach \
+    --conmon-pidfile=%t/extra-app.pid \
+    --cidfile=%t/extra-app.ctr-id \
+    --cgroups=no-conmon \
+    --pod-id-file=%t/windmill.pod-id \
+    --replace --name=extra-app \
+    --volume=lspcache:/pyls/.cache:Z \
+    --env=ENABLE_LSP=true \
+    --env=ENABLE_MULTIPLAYER=false \
+    --env=ENABLE_DEBUGGER=true \
+    --env=DEBUGGER_PORT=3003 \
+    --env=ENABLE_NSJAIL=false \
+    --env=REQUIRE_SIGNED_DEBUG_REQUESTS=true \
+    --env=WINDMILL_BASE_URL=http://127.0.0.1:8000 \
+    ${WINDMILL_EXTRA_IMAGE}
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/extra-app.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/extra-app.ctr-id
+PIDFile=%t/extra-app.pid
+Type=forking
+
+[Install]
+WantedBy=default.target

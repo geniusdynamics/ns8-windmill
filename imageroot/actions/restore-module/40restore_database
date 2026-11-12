@@ -1,33 +1,37 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 set -e -o pipefail
+exec 1>&2 # Redirect any output to the journal (stderr)
 
+# Rebuild the whole PostgreSQL cluster from the dump saved by
+# module-dump-state. The data volume is empty on restore, so the image
+# runs the script below once, during its first initialization.
 mkdir -vp restore
-
-# Create restore script
-cat - >restore/monica_restore.sh <<'EOS'
-# Read dump file from standard input:
-pg_restore --no-owner --no-privileges -U postgres -d db
+cat - >restore/windmill_restore.sh <<'EOS'
+# Read the pg_dumpall output from standard input. The "postgres" role
+# already exists in a new cluster, so its CREATE ROLE statement is dropped:
+# its password and options are still restored by the following ALTER ROLE.
+sed '/^CREATE ROLE postgres;$/d' | psql -v ON_ERROR_STOP=1 -U postgres -d postgres
 ec=$?
 docker_temp_server_stop
 exit $ec
 EOS
 
-# Run the restore container
+# POSTGRES_DB is not set here on purpose: the dump creates the database.
 podman run \
 	--rm \
 	--interactive \
 	--network=none \
 	--volume=./restore:/docker-entrypoint-initdb.d/:Z \
-	--volume=postgres-data:/var/lib/postgresql/data:Z \
+	--volume=dbdata:/var/lib/postgresql:Z \
 	--replace --name=restore_db \
-	--env-file db.env \
-	"${POSTGRES_IMAGE}" <db.pg_dump
+	--env-file=passwords.env \
+	"${POSTGRES_IMAGE}" <windmill.sql
 
 # Clean up
-rm -rfv restore/ db.pg_dump
+rm -rfv restore/ windmill.sql

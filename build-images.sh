@@ -14,6 +14,9 @@ images=()
 repobase="${REPOBASE:-ghcr.io/geniusdynamics}"
 # Configure the image name
 reponame="windmill"
+# Node.js 25+ no longer ships Corepack, install it from npm
+# renovate: datasource=npm packageName=corepack
+corepack_version=0.36.0
 
 # Create a new empty container image
 container=$(buildah from scratch)
@@ -21,7 +24,8 @@ container=$(buildah from scratch)
 # Reuse existing nodebuilder-windmill container, to speed up builds
 if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-windmill; then
 	echo "Pulling NodeJS runtime..."
-	buildah from --name nodebuilder-windmill -v "${PWD}:/usr/src:Z" docker.io/library/node:lts
+	buildah from --name nodebuilder-windmill -v "${PWD}:/usr/src:Z" docker.io/library/node:26.13.0-slim
+	buildah run nodebuilder-windmill sh -c "npm install -g corepack@${corepack_version} && corepack enable"
 fi
 
 echo "Build static UI files with node..."
@@ -35,17 +39,17 @@ buildah run \
 buildah add "${container}" imageroot /imageroot
 buildah add "${container}" ui/dist /ui
 # Setup the entrypoint, ask to reserve one TCP port with the label and set a rootless container
-# Select you image(s) with the label org.nethserver.images
-# ghcr.io/xxxxx is the GitHub container registry or your own registry or docker.io for Docker Hub
-# The image tag is set to latest by default, but can be overridden with the IMAGETAG environment variable
-# --label="org.nethserver.images=docker.io/mariadb:10.11.5 docker.io/roundcube/roundcubemail:1.6.4-apache"
+# The Windmill images (server, workers, extra services) are pinned to the
+# same release. windmill-extra bundles the language server, the debugger and
+# the (Enterprise Edition) multiplayer service.
 # rootfull=0 === rootless container
 # tcp-ports-demand=1 number of tcp Port to reserve , 1 is the minimum, can be udp or tcp
 buildah config --entrypoint=/ \
 	--label="org.nethserver.authorizations=traefik@node:routeadm" \
 	--label="org.nethserver.tcp-ports-demand=1" \
 	--label="org.nethserver.rootfull=0" \
-	--label="org.nethserver.images=ghcr.io/windmill-labs/windmill-multiplayer:main ghcr.io/windmill-labs/caddy-l4:latest docker.io/postgres:16 ghcr.io/windmill-labs/windmill:main  ghcr.io/windmill-labs/windmill-lsp:latest" \
+	--label="org.nethserver.min-core=3.12.4-0" \
+	--label="org.nethserver.images=ghcr.io/windmill-labs/windmill:1.870.0 ghcr.io/windmill-labs/windmill-extra:1.870.0 ghcr.io/windmill-labs/caddy-l4:2.11.4-1 docker.io/postgres:18.6" \
 	"${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
