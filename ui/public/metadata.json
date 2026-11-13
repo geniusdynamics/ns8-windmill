@@ -2,7 +2,7 @@
   "name": "windmill",
   "description": {
     "en": "Open source platform to build internal tools, workflows and scripts in Python, TypeScript, Go and other languages.",
-    "it": "Piattaforma open source per creare strumenti interni, workflow e script in Python, TypeScript, Go e altri linguaggi."
+    "it": "Windmill trasforma script in flussi di lavoro e interfacce, con editor e pianificazione integrati."
   },
   "categories": [
     "development"
