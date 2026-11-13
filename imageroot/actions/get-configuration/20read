@@ -56,9 +56,9 @@ if os.path.exists("multiplayer.env"):
  
 if os.path.exists("caddy.env"): 
 	data = agent.read_envfile("caddy.env") 
-	config["BASE_URL"] = data.get("BASE_URL", "":80"") 
+	config["BASE_URL"] = data.get("BASE_URL", ":80")
 else: 
-	config["BASE_URL"] = "":80"" 
+	config["BASE_URL"] = ":80" 
  
 if os.path.exists("db.env"): 
 	data = agent.read_envfile("db.env") 
