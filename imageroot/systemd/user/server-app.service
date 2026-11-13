@@ -15,6 +15,7 @@ EnvironmentFile=%E/state/environment
 EnvironmentFile=-%E/state/passwords.env
 WorkingDirectory=%E/state
 Restart=always
+RestartSec=10
 TimeoutStopSec=70
 ExecStartPre=/bin/mkdir -p tmp
 ExecStartPre=/bin/rm -f %t/server-app.pid %t/server-app.ctr-id
