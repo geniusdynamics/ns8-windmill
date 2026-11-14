@@ -49,7 +49,7 @@ buildah config --entrypoint=/ \
 	--label="org.nethserver.tcp-ports-demand=1" \
 	--label="org.nethserver.rootfull=0" \
 	--label="org.nethserver.min-core=3.12.4-0" \
-	--label="org.nethserver.images=ghcr.io/windmill-labs/windmill:1.871.1 ghcr.io/windmill-labs/windmill-extra:1.871.1 ghcr.io/windmill-labs/caddy-l4:2.11.4-1 docker.io/postgres:18.7" \
+	--label="org.nethserver.images=ghcr.io/windmill-labs/windmill:1.873.1 ghcr.io/windmill-labs/windmill-extra:1.871.1 ghcr.io/windmill-labs/caddy-l4:2.11.4-1 docker.io/postgres:18.7" \
 	"${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
